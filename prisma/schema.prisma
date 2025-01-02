@@ -9,6 +9,128 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+model User {
+  id            Int             @id @default(autoincrement())
+  email         String          @unique
+  name          String
+  password      String
+  gender        Gender?
+  birthday      DateTime?       @db.Date
+  UserRoles     UserRoles[]
+  RentalSession RentalSession[]
+  LoginSession  LoginSession[]
+  Payment       Payment[]
+
+  @@map("users")
+}
+
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  UserRoles UserRoles[]
+
+  @@map("roles")
+}
+
+model UserRoles {
+  user    User @relation(fields: [user_id], references: [id])
+  user_id Int
+  role    Role @relation(fields: [role_id], references: [id])
+  role_id Int
+
+  @@id([user_id, role_id])
+  @@map("user_roles")
+}
+
+enum RentalSessionStatus {
+  ACTIVE
+  COMPLETED
+  EXTENDED
+}
+
+enum UnitStatus {
+  READY
+  MAINTENANCE
+  RENTED
+}
+
+model RentalSession {
+  id         Int                 @id @default(autoincrement())
+  start_time DateTime            @default(now())
+  end_time   DateTime
+  status     RentalSessionStatus @default(ACTIVE)
+  User       User                @relation(fields: [user_id], references: [id])
+  user_id    Int
+  Unit       Unit                @relation(fields: [unit_id], references: [id])
+  unit_id    Int
+
+  @@map("rental_sessions")
+}
+
+model Unit {
+  id     Int        @id @default(autoincrement())
+  name   String
+  status UnitStatus @default(READY)
+
+  RentalSession RentalSession[]
+
+  @@map("units")
+}
+
+model Plan {
+  id      Int       @id @default(autoincrement())
+  name    String
+  price   Decimal   @db.Decimal(10, 2)
+  Payment Payment[]
+
+  @@map("plans")
+}
+
+enum LoginSessionStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
+model LoginSession {
+  id            Int                @id @default(autoincrement())
+  refresh_token String
+  status        LoginSessionStatus @default(ACTIVE)
+  created_at    DateTime           @default(now())
+  updated_at    DateTime           @default(now())
+  expires_at    DateTime?
+  User          User               @relation(fields: [user_id], references: [id])
+  user_id       Int
+
+  @@map("login_sessions")
+}
+
+enum PaymentStatus {
+  PENDING // This is the initial state when a payment is created
+  PROCESSING // The payment gateway is handling the transaction
+  FAILED
+  SUCCESS
+}
+
+model Payment {
+  id         Int           @id @default(autoincrement())
+  status     PaymentStatus @default(PENDING)
+  created_at DateTime      @default(now())
+  updated_at DateTime      @default(now())
+  User       User          @relation(fields: [user_id], references: [id])
+  user_id    Int
+  Plan       Plan          @relation(fields: [plan_id], references: [id])
+  plan_id    Int
+
+  @@map("payments")
 }
