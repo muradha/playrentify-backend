@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Inject, Param, ParseIntPipe, Patch, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpStatus, Inject, Param, ParseIntPipe, Patch, Post, Put } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { UpdateUserDto, CreateUserDto } from "./users.validation";
 
@@ -9,8 +9,9 @@ export class UsersController {
     ) { }
 
     @Get()
-    findAll() {
-        return this.usersService.getUsers();
+    async findAll() {
+        const users = await this.usersService.getUsers();
+        return this.httpResponse.success(users);
     }
 
     @Get(':id')
@@ -23,23 +24,29 @@ export class UsersController {
     }
 
     @Post()
-    async saveUser(@Body() createUserDto: CreateUserDto) {
+    async createUser(@Body() createUserDto: CreateUserDto) {
         const user = await this.usersService.saveUser(createUserDto.name, createUserDto.email, createUserDto.password);
         if (!user) {
             return this.httpResponse.notFound('User Not Found');
         }
-        return user;
-
+        return this.httpResponse.succes(user, 'User Created');
     }
 
     @Put(':id')
-    @Patch(':id')
     async updateUser(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
         const user = await this.usersService.updateUser(id, updateUserDto.name, updateUserDto.email, updateUserDto.password);
         if (!user) {
             return this.httpResponse.notFound('User Not Found');
         }
-        return user;
+        return this.httpResponse.success(user, 'User Updated');
     }
 
+    @Delete(':id')
+    async deleteUser(@Param('id', ParseIntPipe) id: number) {
+        const user = await this.usersService.getUser(id);
+        if (!user) {
+            return this.httpResponse.notFound('User Not Found');
+        }
+        return this.httpResponse.success(await this.usersService.deleteUserById(id), 'User Deleted');
+    }
 }

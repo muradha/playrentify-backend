@@ -7,11 +7,14 @@ import { HttpResponseProvider } from './common/http-response.provider';
 import { PrismaModule, providePrismaClientExceptionFilter } from 'nestjs-prisma';
 import { APP_PIPE } from '@nestjs/core';
 import { ZodValidationPipe } from 'nestjs-zod';
+import { UnitsController } from './units/units.controller';
+import { UnitsService } from './units/units.service';
+import { AuthController } from './auth/auth.controller';
 
 @Module({
   imports: [PrismaModule],
-  controllers: [AppController, UsersController],
-  providers: [AppService, UsersService, HttpResponseProvider,
+  controllers: [AppController, UsersController, UnitsController, AuthController],
+  providers: [AppService, UsersService, UnitsService, HttpResponseProvider,
     providePrismaClientExceptionFilter(),
     {
       provide: APP_PIPE,
