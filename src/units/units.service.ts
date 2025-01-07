@@ -1,29 +1,28 @@
 import { Injectable } from "@nestjs/common";
-import * as bcrypt from 'bcrypt';
-import { PrismaService } from "nestjs-prisma";
-import { UnitStatus } from "@prisma/client";
+import { UnitStatus, Unit } from "@prisma/client";
+import { UnitsRepository } from "./units.repository";
 
 @Injectable()
 export class UnitsService {
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(private readonly unitsRepository: UnitsRepository) { }
 
-    async getUnits() {
-        return await this.prisma.unit.findMany()
+    async getUnits(): Promise<Unit[]> {
+        return await this.unitsRepository.getUnits();
     }
 
-    async getUnit(id: number) {
-        return await this.prisma.unit.findUnique({ where: { id } });
+    async getUnit(id: number): Promise<Unit | null> {
+        return await this.unitsRepository.getUnit(id);
     }
 
-    async saveUnit(name: string, status: UnitStatus) {
-        return await this.prisma.unit.create({ data: { name, status } });
+    async saveUnit(name: string, status: UnitStatus): Promise<Unit> {
+        return await this.unitsRepository.saveUnit(name, status);
     }
 
-    async updateUnit(id: number, name: string, status: UnitStatus) {
-        return await this.prisma.unit.update({ where: { id }, data: { name, status } });
+    async updateUnit(id: number, name: string, status: UnitStatus): Promise<Unit> {
+        return await this.unitsRepository.updateUnit(id, name, status);
     }
 
-    async deleteUnitById(id: number) {
-        return await this.prisma.unit.delete({ where: { id } });
+    async deleteUnitById(id: number): Promise<Unit> {
+        return await this.unitsRepository.deleteUnitById(id);
     }
 }

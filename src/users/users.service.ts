@@ -1,32 +1,32 @@
 import { Injectable } from "@nestjs/common";
 import * as bcrypt from 'bcrypt';
-import { PrismaService } from "nestjs-prisma";
+import { UsersRepository } from "./users.repository";
 
 @Injectable()
 export class UsersService {
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(private readonly usersRepository: UsersRepository) { }
 
     async getUsers() {
-        return await this.prisma.user.findMany()
+        return await this.usersRepository.getUsers();
     }
 
     async getUser(id: number) {
-        return await this.prisma.user.findUnique({ where: { id } });
+        return await this.usersRepository.getUser(id);
     }
 
     async saveUser(name: string, email: string, password: string) {
         const saltOrRounds = 10;
         const hash = await bcrypt.hash(password, saltOrRounds);
-        return await this.prisma.user.create({ data: { name, email, password: hash } });
+        return await this.usersRepository.saveUser(name, email, hash);
     }
 
     async updateUser(id: number, name: string, email: string, password: string) {
         const saltOrRounds = 10;
         const hash = await bcrypt.hash(password, saltOrRounds);
-        return await this.prisma.user.update({ where: { id }, data: { name, email, password: hash } });
+        return await this.usersRepository.updateUser(id, name, email, hash);
     }
 
     async deleteUserById(id: number) {
-        return await this.prisma.user.delete({ where: { id } });
+        return await this.usersRepository.deleteUserById(id);
     }
 }

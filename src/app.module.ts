@@ -1,20 +1,19 @@
 import { HttpStatus, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersController } from './users/users.controller';
-import { UsersService } from './users/users.service';
 import { HttpResponseProvider } from './common/http-response.provider';
-import { PrismaModule, providePrismaClientExceptionFilter } from 'nestjs-prisma';
+import { providePrismaClientExceptionFilter } from 'nestjs-prisma';
 import { APP_PIPE } from '@nestjs/core';
 import { ZodValidationPipe } from 'nestjs-zod';
-import { UnitsController } from './units/units.controller';
-import { UnitsService } from './units/units.service';
-import { AuthController } from './auth/auth.controller';
+import { UnitsModule } from './units/units.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { CoreModule } from './core/core.module';
 
 @Module({
-  imports: [PrismaModule],
-  controllers: [AppController, UsersController, UnitsController, AuthController],
-  providers: [AppService, UsersService, UnitsService, HttpResponseProvider,
+  imports: [CoreModule, UnitsModule, UsersModule, AuthModule],
+  controllers: [AppController],
+  providers: [AppService,
     providePrismaClientExceptionFilter(),
     {
       provide: APP_PIPE,
@@ -22,4 +21,4 @@ import { AuthController } from './auth/auth.controller';
     },
   ]
 })
-export class AppModule { }
+export class AppModule { } 

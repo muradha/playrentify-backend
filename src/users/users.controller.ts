@@ -1,26 +1,29 @@
-import { Body, Controller, Delete, Get, HttpStatus, Inject, Param, ParseIntPipe, Patch, Post, Put } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, Get, HttpStatus, Inject, Param, ParseIntPipe, Patch, Post, Put, UseInterceptors } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { UpdateUserDto, CreateUserDto } from "./users.validation";
+import { HttpResponseProvider } from "src/common/http-response.provider";
+import { UserEntity } from "./users.entity";
 
 @Controller('users')
 export class UsersController {
     constructor(private usersService: UsersService,
-        @Inject('HttpResponse') private readonly httpResponse: any,
+        private readonly httpResponse: HttpResponseProvider,
     ) { }
 
+    @UseInterceptors(ClassSerializerInterceptor)
     @Get()
     async findAll() {
         const users = await this.usersService.getUsers();
-        return this.httpResponse.success(users);
+        return this.httpResponse.success(users.map(user => new UserEntity(user)));
     }
 
-    @Get(':id')
+    @Get(':id') 
     async findOne(@Param('id', ParseIntPipe) id: number) {
         const user = await this.usersService.getUser(id);
         if (!user) {
             return this.httpResponse.notFound('User Not Found');
         }
-        return this.httpResponse.success(user, 'User Found');
+        return this.httpResponse.success(new UserEntity(user), 'User Found');
     }
 
     @Post()
@@ -29,7 +32,7 @@ export class UsersController {
         if (!user) {
             return this.httpResponse.notFound('User Not Found');
         }
-        return this.httpResponse.succes(user, 'User Created');
+        return this.httpResponse.success(user, 'User Created');
     }
 
     @Put(':id')

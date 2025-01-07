@@ -1,11 +1,12 @@
 import { Body, Controller, Delete, Get, HttpStatus, Inject, Param, ParseIntPipe, Patch, Post, Put } from "@nestjs/common";
 import { UnitsService } from "./units.service";
 import { CreateUnitDto, UpdateUnitDto } from "./units.validation";
+import { HttpResponseProvider } from "src/core/core.module";
 
 @Controller('units')
 export class UnitsController {
     constructor(private unitsService: UnitsService,
-        @Inject('HttpResponse') private readonly httpResponse: any,
+        private readonly httpResponse: HttpResponseProvider,
     ) { }
 
     @Get()
