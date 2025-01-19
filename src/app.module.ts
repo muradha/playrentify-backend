@@ -9,6 +9,7 @@ import { UnitsModule } from './units/units.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { CoreModule } from './core/core.module';
+import { AuthGuard } from './auth/auth.guard';
 
 @Module({
   imports: [CoreModule, UnitsModule, UsersModule, AuthModule],
@@ -19,6 +20,10 @@ import { CoreModule } from './core/core.module';
       provide: APP_PIPE,
       useClass: ZodValidationPipe,
     },
+    {
+      provide: 'APP_GUARD',
+      useClass: AuthGuard
+    }
   ]
 })
 export class AppModule { } 
