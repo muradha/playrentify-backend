@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { HttpResponseProvider } from 'src/common/http-response.provider';
@@ -10,6 +11,7 @@ export class AuthService {
         private usersRepository: UsersRepository,
         private jwtService: JwtService,
         private readonly httpResponse: HttpResponseProvider,
+        private configService: ConfigService
     ) { }
 
     async signIn(email: string, password: string) {
@@ -20,9 +22,9 @@ export class AuthService {
         }
         if (user && await bcrypt.compare(password, user.password)) {
             const payload = { sub: user.id, email: user.email };
-            return {
-                access_token: await this.jwtService.signAsync(payload),
-            };
+            return this.httpResponse.success({
+                access_token: await this.jwtService.signAsync(payload, { secret: this.configService.get<string>('JWT_SECRET') }),
+            });
         } else {
             throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
         }

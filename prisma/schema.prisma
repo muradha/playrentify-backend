@@ -110,7 +110,7 @@ model LoginSession {
   updated_at    DateTime           @default(now())
   expires_at    DateTime?
   User          User               @relation(fields: [user_id], references: [id])
-  user_id       Int
+  user_id       Int                @unique
 
   @@map("login_sessions")
 }
