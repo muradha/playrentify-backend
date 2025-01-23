@@ -26,9 +26,6 @@ export class UnitsController {
     @Post()
     async saveUnit(@Body() createUnitDto: CreateUnitDto) {
         const unit = await this.unitsService.saveUnit(createUnitDto.name, createUnitDto.status);
-        if (!unit) {
-            return this.httpResponse.notFound('Unit Not Found');
-        }
         return this.httpResponse.success(unit, 'Unit created');
     }
 
