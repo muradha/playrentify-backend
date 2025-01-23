@@ -1,18 +1,13 @@
-import { HttpStatus, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { HttpResponseProvider } from './common/http-response.provider';
 import { providePrismaClientExceptionFilter } from 'nestjs-prisma';
 import { APP_PIPE } from '@nestjs/core';
 import { ZodValidationPipe } from 'nestjs-zod';
-import { UnitsModule } from './units/units.module';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { CoreModule } from './core/core.module';
-import { AuthGuard } from './auth/auth.guard';
+import { AuthModule, UsersModule, CoreModule, RolesModule, AuthGuard, UnitsModule } from './modules';
 
 @Module({
-  imports: [CoreModule, UnitsModule, UsersModule, AuthModule],
+  imports: [CoreModule, UnitsModule, UsersModule, AuthModule, RolesModule],
   controllers: [AppController],
   providers: [AppService,
     providePrismaClientExceptionFilter(),
