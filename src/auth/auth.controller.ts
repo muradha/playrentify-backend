@@ -14,18 +14,18 @@ export class AuthController {
     @Public()
     @Post('login')
     async login(@Body() body: LoginDto) {
-        return this.authService.signIn(body.email, body.password);
+        return this.httpResponse.success(await this.authService.signIn(body.email, body.password));
     }
 
     @Public()
     @Post('register')
     async signUp(@Body() body: SignUpDto) {
-        return this.authService.signUp(body.username, body.email, body.password);
+        return this.httpResponse.success(await this.authService.signUp(body.username, body.email, body.password));
     }
 
     @Public()
     @Post('refresh')
     async refreshToken(@Body() body: { refresh_token: string }) {
-        return this.authService.generateAccessToken(body.refresh_token);
+        return this.httpResponse.success(await this.authService.generateAccessToken(body.refresh_token));
     }
 }

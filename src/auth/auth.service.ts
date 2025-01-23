@@ -12,7 +12,6 @@ export class AuthService {
         private usersRepository: UsersRepository,
         private authRepository: AuthRepository,
         private jwtService: JwtService,
-        private readonly httpResponse: HttpResponseProvider,
         private configService: ConfigService
     ) { }
 
@@ -30,10 +29,7 @@ export class AuthService {
 
             await this.authRepository.saveRefreshToken(user.id, refresh_token, expiresAt);
 
-            return this.httpResponse.success({
-                access_token,
-                refresh_token
-            });
+            return { access_token, refresh_token };
         } else {
             throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
         }
@@ -49,7 +45,7 @@ export class AuthService {
         const saltOrRounds = 10;
         const hash = await bcrypt.hash(password, saltOrRounds);
         const createdUser = await this.usersRepository.saveUser(name, email, hash);
-        return this.httpResponse.success(createdUser, 'Registered Successfully');
+        return createdUser;
     }
 
     async generateAccessToken(refreshToken: string) {
@@ -61,11 +57,11 @@ export class AuthService {
                 throw new HttpException('User not found', HttpStatus.NOT_FOUND);
             }
             const payload = { sub: userId, email: user.email };
-            const generatedAccessToken = await this.jwtService.signAsync(payload, { secret: this.configService.get<string>('JWT_SECRET'), expiresIn: '60s' });
+            const generatedAccessToken = await this.jwtService.signAsync(payload, { secret: this.configService.get<string>('JWT_SECRET'), expiresIn: '24h' });
             
-            return this.httpResponse.success({
+            return {
                 access_token: generatedAccessToken
-            });
+            };
         } catch (error) {
             if (error instanceof TokenExpiredError) {
                 throw new HttpException('Refresh token expired', HttpStatus.UNAUTHORIZED);
