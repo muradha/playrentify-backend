@@ -5,16 +5,16 @@ import { PrismaService } from "nestjs-prisma";
 export class AuthRepository {
     constructor(private readonly prisma: PrismaService) { }
 
-    async saveRefreshToken(userId: number, refreshToken: string) {
+    async saveRefreshToken(userId: number, refreshToken: string, expiresAt: Date) {
         return await this.prisma.loginSession.create({
-            data: { refresh_token: refreshToken, user_id: userId, expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24) },
+            data: { refresh_token: refreshToken, user_id: userId, expires_at: expiresAt },
         });
     }
 
-    async updateRefreshToken(userId: number, refreshToken: string) {
+    async updateRefreshToken(userId: number, refreshToken: string, expiresAt: Date) {
         return await this.prisma.loginSession.update({
             where: { id: userId },
-            data: { refresh_token: refreshToken, expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24) },
+            data: { refresh_token: refreshToken, expires_at: expiresAt },
         });
     }
 }   

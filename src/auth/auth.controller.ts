@@ -22,4 +22,10 @@ export class AuthController {
     async signUp(@Body() body: SignUpDto) {
         return this.authService.signUp(body.username, body.email, body.password);
     }
+
+    @Public()
+    @Post('refresh')
+    async refreshToken(@Body() body: { refresh_token: string }) {
+        return this.authService.generateAccessToken(body.refresh_token);
+    }
 }

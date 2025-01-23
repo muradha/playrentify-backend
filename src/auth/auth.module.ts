@@ -6,6 +6,7 @@ import { UsersRepository } from "src/users/users.repository";
 import { JwtModule, JwtService } from "@nestjs/jwt";
 import { CoreModule } from "src/core/core.module";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { AuthRepository } from "./auth.repository";
 
 @Module({
     imports: [PrismaModule, CoreModule, ConfigModule.forRoot({
@@ -19,7 +20,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
         inject: [ConfigService], // Inject ConfigService ke useFactory
     }),],
     controllers: [AuthController],
-    providers: [AuthService, UsersRepository, JwtService],
+    providers: [AuthService, UsersRepository, AuthRepository, JwtService],
     exports: [AuthService]
 })
 
